@@ -68,9 +68,7 @@ def _filter_flags(clang_flags: List[str]) -> List[str]:  # noqa: C901
         matched_prefix = [
             prefix for prefix in PLUGIN_OPT_PREFIXES if flag.startswith(prefix)
         ]
-        if matched_prefix:
-            return matched_prefix[0]
-        return ""
+        return matched_prefix[0] if matched_prefix else ""
 
     plugin_opt_to_llvm_flag_map = {
         "sample-profile=": "-fprofile-sample-use=",

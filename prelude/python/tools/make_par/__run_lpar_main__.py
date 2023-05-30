@@ -17,14 +17,7 @@ def __invoke_main():
 
     module = os.getenv("FB_LPAR_MAIN_MODULE")
 
-    # Allow users to decorate the main module. In normal Python invocations
-    # this can be done by prefixing the arguments with `-m decoratingmodule`.
-    # It's not that easy for par files. The startup script sets up `sys.path`
-    # from within the Python interpreter. Enable decorating the main module
-    # after `sys.path` has been setup by setting the PAR_MAIN_OVERRIDE
-    # environment variable.
-    decorate_main_module = os.environ.pop("PAR_MAIN_OVERRIDE", None)
-    if decorate_main_module:
+    if decorate_main_module := os.environ.pop("PAR_MAIN_OVERRIDE", None):
         # Pass the original main module as environment variable for the process.
         # Allowing the decorating module to pick it up.
         # pyre-fixme[6]: For 2nd argument expected `str` but got `Optional[str]`.
@@ -52,14 +45,9 @@ def __invoke_main():
 
         pdb = Pdb()
 
-        # Support passing initial commands to pdb. We cannot pass the -c argument
-        # to pdb. Instead, allow users to pass initial commands through the
-        # PYTHONPDBINITIALCOMMANDS env var, separated by the | character.
-        #
-        # Note: use pop to avoid leaking the environment variable to the child
-        # process.
-        initial_commands = os.environ.pop("PYTHONPDBINITIALCOMMANDS", None)
-        if initial_commands:
+        if initial_commands := os.environ.pop(
+            "PYTHONPDBINITIALCOMMANDS", None
+        ):
             pdb.rcLines.extend(initial_commands.split("|"))
 
         del os

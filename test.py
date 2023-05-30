@@ -38,7 +38,7 @@ class Colors(Enum):
 
 
 def print_running(msg: str) -> None:
-    print(Colors.OKGREEN.value + "Running " + msg + Colors.ENDC.value)
+    print(f"{Colors.OKGREEN.value}Running {msg}{Colors.ENDC.value}")
 
 
 def print_error(msg: str) -> None:
@@ -73,7 +73,7 @@ def run(
     sys.stdout.flush()
     sys.stderr.flush()
     try:
-        result = subprocess.run(
+        return subprocess.run(
             tuple(args),
             # We'd like to use the capture_output argument,
             # but that isn't available in Python 3.6 which we use on Windows
@@ -83,7 +83,6 @@ def run(
             encoding="utf-8",
             env=env or os.environ.copy(),
         )
-        return result
     except subprocess.CalledProcessError as e:
         # Print the console info if we were capturing it
         if capture_output:
@@ -146,7 +145,7 @@ def list_starlark_files(git: bool):
             + excludes
         )
 
-    starlark_files = (
+    return (
         run(
             cmd,
             capture_output=True,
@@ -154,7 +153,6 @@ def list_starlark_files(git: bool):
         .stdout.strip()
         .splitlines()
     )
-    return starlark_files
 
 
 def rustfmt(buck2_dir: Path, ci: bool, git: bool) -> None:
@@ -362,7 +360,7 @@ def starlark_linter(buck2: str, git: bool) -> None:
                 "starlark",
                 "lint",
                 "--no-buckd",
-                "@" + fp.name,
+                f"@{fp.name}",
             ]
         )
 
@@ -504,7 +502,7 @@ def main() -> None:
         package_args.append("--workspace")
         package_args.extend([f"--exclude={p.rstrip('/')}" for p in args.exclude])
 
-    if package_args == [] and not (args.lint_rust_only or args.rustfmt_only):
+    if not package_args and not args.lint_rust_only and not args.rustfmt_only:
         with timing():
             starlark_linter(args.buck2, args.git)
 

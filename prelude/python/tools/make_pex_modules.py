@@ -285,20 +285,15 @@ def create_modules_dir(args: argparse.Namespace) -> None:
         try:
             os.symlink(target, dest)
         except OSError:
-            if _lexists(dest):
-                if os.path.islink(dest):
-                    raise ValueError(
-                        "{} already exists, and is linked to {}. Cannot link to {}".format(
-                            dest, os.readlink(dest), target
-                        )
-                    )
-                else:
-                    raise ValueError(
-                        "{} already exists. Cannot link to {}".format(dest, target)
-                    )
-            else:
+            if not _lexists(dest):
                 raise
 
+            if os.path.islink(dest):
+                raise ValueError(
+                    f"{dest} already exists, and is linked to {os.readlink(dest)}. Cannot link to {target}"
+                )
+            else:
+                raise ValueError(f"{dest} already exists. Cannot link to {target}")
     # Fill in __init__.py for sources that were provided by the user
     # These are filtered such that we only create this for sources specified
     # by the user; if a .whl fortgets an __init__.py file, that's their problem

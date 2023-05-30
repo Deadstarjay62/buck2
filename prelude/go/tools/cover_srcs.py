@@ -70,10 +70,7 @@ def main(argv):
         if coverage_vars:
             print("--cover-pkgs", file=f)
             print(
-                "{}:{}".format(
-                    args.pkg_name,
-                    ",".join([f"{var}={name}" for var, name in coverage_vars.items()]),
-                ),
+                f'{args.pkg_name}:{",".join([f"{var}={name}" for var, name in coverage_vars.items()])}',
                 file=f,
             )
 

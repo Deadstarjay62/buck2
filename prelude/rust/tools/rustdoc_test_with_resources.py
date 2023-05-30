@@ -65,7 +65,7 @@ def main():
 
     # Copy resources.json.
     # Folly looks for a sibling of the executable, with this suffix.
-    buck_resources_json = buck_tmpdir / (test_binary.name + ".resources.json")
+    buck_resources_json = buck_tmpdir / f"{test_binary.name}.resources.json"
     shutil.copy2(args.resources, buck_resources_json)
 
     # Run test.

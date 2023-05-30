@@ -42,7 +42,7 @@ class Module:
             # module names can only be ascii or _
             sanitized_name = re.sub(r"[^A-Za-z0-9_]", "_", sanitized_name)
             if sanitized_name[0].isdigit():
-                sanitized_name = "_" + sanitized_name
+                sanitized_name = f"_{sanitized_name}"
 
             # avoid any collisions with other files
             while sanitized_name in submodule_names:
@@ -80,11 +80,7 @@ def _write_submodules(
     for h in headers:
         module = root_module
         for i, component in enumerate(h.split(os.sep)):
-            if i == 0 and component == name:
-                # The common case is we have a singe header path prefix that matches the module name.
-                # In this case we add the headers directly to the root module.
-                pass
-            else:
+            if i != 0 or component != name:
                 module = module.get_submodule(component)
 
         module.add_header(h)

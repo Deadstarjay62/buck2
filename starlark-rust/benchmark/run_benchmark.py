@@ -50,8 +50,8 @@ def generate_benchmarks(dir):
         # Whichever one is committed, make sure we switch it for this one
         src2 = src
         for x in benchmarks:
-            src2 = src2.replace("print(" + x + "())", "print(" + benchmark + "())")
-        output = Path(dir).joinpath(benchmark + ".py")
+            src2 = src2.replace(f"print({x}())", f"print({benchmark}())")
+        output = Path(dir).joinpath(f"{benchmark}.py")
         with open(output, "w") as out:
             out.write(src2)
         outputs[benchmark] = output
@@ -62,9 +62,7 @@ def cmd(args):
     res = subprocess.run(args, capture_output=True)
     if res.returncode != 0:
         raise Exception(
-            "Command failed: {}\nStdout: {}\nStderr: {}".format(
-                args, res.stdout, res.stderr
-            )
+            f"Command failed: {args}\nStdout: {res.stdout}\nStderr: {res.stderr}"
         )
 
 
@@ -112,7 +110,7 @@ def main():
         benchmarks = generate_benchmarks(dir)
         for name, file in benchmarks.items():
             if len(args.benchmarks) == 0 or name in args.benchmarks:
-                print("Benchmarking: " + name + " ", end="", flush=True)
+                print(f"Benchmarking: {name} ", end="", flush=True)
                 (py, st) = absh(("python3", file), (starlark, file), repeat=args.repeat)
                 print("Python3 {:.2f}s, Starlark Rust {:.2f}s".format(py, st))
 

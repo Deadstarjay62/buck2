@@ -72,10 +72,7 @@ def main():
     for crate_name, artifact in args.artifact:
         crate_name = crate_name.read_text().strip()
         original_filename = artifact.name
-        new_filename = "lib{}-{}".format(
-            crate_name,
-            original_filename.rsplit("-", 1)[1],
-        )
+        new_filename = f'lib{crate_name}-{original_filename.rsplit("-", 1)[1]}'
         if new_filename in deps_dirs[-1]:
             deps_dirs.append({})
         deps_dirs[-1][new_filename] = artifact
@@ -85,7 +82,7 @@ def main():
     for idx, srcs in enumerate(deps_dirs):
         directory = args.out_dir.joinpath(str(idx))
         directory.mkdir()
-        flags += "-Ldependency={}\n".format(directory)
+        flags += f"-Ldependency={directory}\n"
         for filename, artifact in srcs.items():
             directory.joinpath(filename).symlink_to(artifact)
 

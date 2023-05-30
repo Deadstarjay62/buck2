@@ -49,9 +49,9 @@ def doc_name(x):
     elif x.startswith("native/standard/") or x.startswith("native/extension/"):
         return "starlark/" + x.split("/")[-1]
     elif x.startswith("native/"):
-        return "build/" + x[7:]
+        return f"build/{x[7:]}"
     else:
-        raise RuntimeError("Unknown name: " + x)
+        raise RuntimeError(f"Unknown name: {x}")
 
 
 def main() -> None:
@@ -84,7 +84,8 @@ def main() -> None:
         name = Path(x).stem
         prefix = "---\nid: " + name + "\n---\n"
         write_file(
-            "docs/developers/starlark/" + name + ".generated.md", prefix + read_file(x)
+            f"docs/developers/starlark/{name}.generated.md",
+            prefix + read_file(x),
         )
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -114,7 +115,7 @@ def main() -> None:
                 prefix += "# Rules\n\nThese rules are available as standard in Buck2.\n"
                 src = "\n".join(src.splitlines()[1:])
 
-            dest = "docs/api/" + name + ".generated.md"
+            dest = f"docs/api/{name}.generated.md"
             os.makedirs(Path(dest).parent, exist_ok=True)
             write_file(dest, prefix + src)
 

@@ -27,7 +27,7 @@ class jll_artifact:
 
     def form_artifact_dependency(self):
         """Creates artifact dependency line that goes inside julia source file."""
-        return '{} = "{}"'.format(self.artifact_name, self.artifacts_path)
+        return f'{self.artifact_name} = "{self.artifacts_path}"'
 
 
 class jll_library:
@@ -47,13 +47,13 @@ class jll_library:
 
     def _create_jll_src(self):
         """Creates the library src.jl file."""
-        src_filename = self.package_name + ".jl"
+        src_filename = f"{self.package_name}.jl"
         src_path = self.package_dir / "src"
         src_path.mkdir(parents=True, exist_ok=True)
 
         exports = [a.artifact_name for a in self.jll_artifacts]
         with open(src_path / src_filename, "w") as src_file:
-            src_file.write("module " + self.package_name + "\n")
+            src_file.write(f"module {self.package_name}" + "\n")
             src_file.write("export " + ", ".join(exports) + "\n")
             for a in self.jll_artifacts:
                 src_file.write(a.form_artifact_dependency() + "\n")
@@ -62,8 +62,8 @@ class jll_library:
     def _create_project_toml(self):
         """Creates the library Project.toml file."""
         with open(self.package_dir / "Project.toml", "w") as toml_file:
-            toml_file.write('name = "{}"\n'.format(self.package_name))
-            toml_file.write('uuid = "{}"\n'.format(self.uuid))
+            toml_file.write(f'name = "{self.package_name}"\n')
+            toml_file.write(f'uuid = "{self.uuid}"\n')
             toml_file.close()
 
 
@@ -72,10 +72,8 @@ def parse_json(args, lib_dir):
     json_file = args.json_path
     json_path = os.path.split(json_file)[0]
 
-    f = open(json_file)
-    data = json.load(f)
-    f.close()
-
+    with open(json_file) as f:
+        data = json.load(f)
     libs = []
     for entry in data:
         # parse the jll itself into our data structure
@@ -101,14 +99,13 @@ def build_command(args, lib_dir, depot_dir):
 
     # Compose the environment variables to pass
     my_env = os.environ.copy()
-    my_env["JULIA_LOAD_PATH"] = "{}:{}::".format(args.lib_path, lib_dir)
-    my_env["JULIA_DEPOT_PATH"] = "{}:{}::".format(args.lib_path, depot_dir)
+    my_env["JULIA_LOAD_PATH"] = f"{args.lib_path}:{lib_dir}::"
+    my_env["JULIA_DEPOT_PATH"] = f"{args.lib_path}:{depot_dir}::"
 
     # For now, we hard code the path of the shlibs relative to the json file.
-    my_env["LD_LIBRARY_PATH"] = "{}:{}".format(
-        pathlib.Path(args.lib_path) / "../__shared_libs_symlink_tree__",
-        my_env.setdefault("LD_LIBRARY_PATH", ""),
-    )
+    my_env[
+        "LD_LIBRARY_PATH"
+    ] = f'{pathlib.Path(args.lib_path) / "../__shared_libs_symlink_tree__"}:{my_env.setdefault("LD_LIBRARY_PATH", "")}'
 
     # Iterate through environment variables passed by argparse
     if args.env != "":

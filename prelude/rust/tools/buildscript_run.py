@@ -33,12 +33,8 @@ def cfg_env(rustc_cfg: Path) -> Dict[str, str]:
             key = keyval[0]
             val = keyval[1].replace('"', "") if len(keyval) > 1 else "1"
 
-            key = "CARGO_CFG_" + key.upper()
-            if key in cfgs:
-                cfgs[key] = cfgs[key] + "," + val
-            else:
-                cfgs[key] = val
-
+            key = f"CARGO_CFG_{key.upper()}"
+            cfgs[key] = f"{cfgs[key]},{val}" if key in cfgs else val
     return cfgs
 
 
@@ -155,9 +151,8 @@ def main() -> None:  # noqa: C901
     cargo_rustc_cfg_pattern = re.compile("^cargo:rustc-cfg=(.*)")
     flags = ""
     for line in script_output.split("\n"):
-        cargo_rustc_cfg_match = cargo_rustc_cfg_pattern.match(line)
-        if cargo_rustc_cfg_match:
-            flags += "--cfg={}\n".format(cargo_rustc_cfg_match.group(1))
+        if cargo_rustc_cfg_match := cargo_rustc_cfg_pattern.match(line):
+            flags += f"--cfg={cargo_rustc_cfg_match[1]}\n"
         else:
             print(line)
     args.outfile.write(flags)

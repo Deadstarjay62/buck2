@@ -57,9 +57,9 @@ def _get_argsfile(args) -> str:
 def _extract_lib_search_path(argsfile_path: str) -> List[str]:
     lib_search_path = []
     with open(argsfile_path) as argsfile:
-        for line in argsfile:
-            if line.startswith("-L"):
-                lib_search_path.append(line.strip())
+        lib_search_path.extend(
+            line.strip() for line in argsfile if line.startswith("-L")
+        )
     return lib_search_path
 
 
@@ -161,7 +161,7 @@ def main(argv):
         os.makedirs(os.path.dirname(output_loc), exist_ok=True)
 
         if os.path.exists(imports_path):
-            assert os.path.exists(bc_file), "missing bc file for %s" % path
+            assert os.path.exists(bc_file), f"missing bc file for {path}"
             os.rename(bc_file, output_loc)
             imports = read_imports(path, imports_path)
             imports_list = []

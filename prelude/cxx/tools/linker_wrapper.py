@@ -30,7 +30,7 @@ def is_whole_archive_option(argument):
 
 def expand_library_path(argument, full_library_paths):
     library_name = argument.split(":", maxsplit=1)[-1]
-    return "/WHOLEARCHIVE:" + full_library_paths[library_name]
+    return f"/WHOLEARCHIVE:{full_library_paths[library_name]}"
 
 
 # NOTE: it does not check for cycles
@@ -76,17 +76,17 @@ def main():
 
     # Based on rustc's @linker-arguments file construction.
     # https://github.com/rust-lang/rust/blob/1.69.0/compiler/rustc_codegen_ssa/src/back/link.rs#L1383-L1407
-    quoted_new_args = ('"{}"\n'.format(arg) for arg in new_args)
+    quoted_new_args = (f'"{arg}"\n' for arg in new_args)
     new_args_content = "".join(quoted_new_args).encode("utf-16")
 
-    debug = "[\n" + "".join('    "{}"\n'.format(arg) for arg in new_args) + "]"
+    debug = "[\n" + "".join(f'    "{arg}"\n' for arg in new_args) + "]"
     print(f"linker_args = {debug}", file=sys.stderr)
 
     with tempfile.NamedTemporaryFile(mode="wb", delete=False) as new_args_file:
         new_args_file.write(new_args_content)
         new_args_file_name = new_args_file.name
 
-    command = [linker_real, "@" + new_args_file_name]
+    command = [linker_real, f"@{new_args_file_name}"]
     subprocess.run(command, check=True)
 
 

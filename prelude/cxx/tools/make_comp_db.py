@@ -27,18 +27,12 @@ def gen(args):
     Generate a single compilation command in JSON form.
     """
 
-    entry = {}
-    entry["file"] = args.directory + "/" + args.filename
-    entry["directory"] = "."
-
+    entry = {"file": f"{args.directory}/{args.filename}", "directory": "."}
     arguments = []
     for arg in args.arguments:
         if arg.startswith("@"):
             with open(arg[1:]) as argsfile:
-                for line in argsfile:
-                    # The argsfile's arguments are separated by newlines; we
-                    # don't want those included in the argument list.
-                    arguments.append(" ".join(shlex.split(line)))
+                arguments.extend(" ".join(shlex.split(line)) for line in argsfile)
         else:
             arguments.append(arg)
     entry["arguments"] = arguments

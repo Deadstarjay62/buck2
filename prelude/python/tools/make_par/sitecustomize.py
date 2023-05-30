@@ -28,7 +28,7 @@ def __patch_spawn(var_names, saved_env):
             for var in var_names:
                 val = os.environ.get(var, None)
                 if val is not None:
-                    os.environ["FB_SAVED_" + var] = val
+                    os.environ[f"FB_SAVED_{var}"] = val
                 saved_val = saved_env.get(var, None)
                 if saved_val is not None:
                     os.environ[var] = saved_val
@@ -59,7 +59,7 @@ def __clear_env(patch_spawn=True):
         curr_val = os.environ.pop(var, None)
         if curr_val is not None:
             saved_env[var] = curr_val
-        val = os.environ.pop("FB_SAVED_" + var, None)
+        val = os.environ.pop(f"FB_SAVED_{var}", None)
         if val is not None:
             os.environ[var] = val
 
@@ -69,12 +69,9 @@ def __clear_env(patch_spawn=True):
 
 # pyre-fixme[3]: Return type must be annotated.
 def __passthrough_exec_module():
-    # Delegate this module execution to the next module in the path, if any,
-    # effectively making this sitecustomize.py a passthrough module.
-    spec = PathFinder.find_spec(
+    if spec := PathFinder.find_spec(
         __name__, path=[p for p in sys.path if not __file__.startswith(p)]
-    )
-    if spec:
+    ):
         mod = module_from_spec(spec)
         sys.modules[__name__] = mod
         # pyre-fixme[16]: Optional type has no attribute `exec_module`.

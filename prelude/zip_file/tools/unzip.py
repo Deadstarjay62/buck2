@@ -56,8 +56,8 @@ def _is_symlink(zip_info):
 
 def main():
     args = _parse_args()
-    print("Source zip is: {}".format(args.src), file=sys.stderr)
-    print("Output destination is: {}".format(args.dst), file=sys.stderr)
+    print(f"Source zip is: {args.src}", file=sys.stderr)
+    print(f"Output destination is: {args.dst}", file=sys.stderr)
     do_unzip(args.src, args.dst)
 
 
