@@ -146,9 +146,7 @@ async def handle_output(  # noqa: C901
         if diag.get("level") == "error":
             got_error_diag = True
 
-        # Add more information to unused crate warnings
-        unused_names = diag.get("unused_extern_names", None)
-        if unused_names:
+        if unused_names := diag.get("unused_extern_names", None):
             # Treat error-level unused dep warnings as errors
             if diag.get("lint_level") in ("deny", "forbid"):
                 got_error_diag = True
@@ -157,9 +155,9 @@ async def handle_output(  # noqa: C901
                 rendered_unused = []
                 for name in unused_names:
                     if name in crate_map:
-                        rendered_unused.append("{}: {}".format(crate_map[name], name))
+                        rendered_unused.append(f"{crate_map[name]}: {name}")
                     else:
-                        rendered_unused.append("{}".format(name))
+                        rendered_unused.append(f"{name}")
                 rendered_unused.sort()
                 rendered_unused = "\n    ".join(rendered_unused)
 
@@ -231,11 +229,9 @@ async def main() -> int:
     if args.env:
         # Unescape previously escaped newlines.
         # Example: \\\\n\\n -> \\\n\n -> \\n\n
-        env.update(
-            {k: v.replace("\\n", "\n").replace("\\\n", "\\n") for k, v in args.env}
-        )
+        env |= {k: v.replace("\\n", "\n").replace("\\\n", "\\n") for k, v in args.env}
     if args.path_env:
-        env.update({k: str(Path(v).resolve()) for k, v in args.path_env})
+        env |= {k: str(Path(v).resolve()) for k, v in args.path_env}
 
     crate_map = dict(args.crate_map) if args.crate_map else {}
 
@@ -246,30 +242,26 @@ async def main() -> int:
     rustc_args = args.rustc[1:]
 
     if args.remap_cwd_prefix is not None:
+        rustc_args.append(f"--remap-path-prefix={os.getcwd()}={args.remap_cwd_prefix}")
         rustc_args.append(
-            "--remap-path-prefix={}={}".format(os.getcwd(), args.remap_cwd_prefix)
-        )
-        rustc_args.append(
-            "--remap-path-prefix={}={}".format(
-                os.path.realpath(os.getcwd()), args.remap_cwd_prefix
-            )
+            f"--remap-path-prefix={os.path.realpath(os.getcwd())}={args.remap_cwd_prefix}"
         )
 
     with tempfile.NamedTemporaryFile(
-        mode="wb",
-        prefix="rustc-args-",
-        suffix=".txt",
-        delete=False,
-    ) as args_file:
+            mode="wb",
+            prefix="rustc-args-",
+            suffix=".txt",
+            delete=False,
+        ) as args_file:
         args_file.write("\n".join(rustc_args).encode() + b"\n")
         args_file.flush()
         # Kick off the action
         proc = await asyncio.create_subprocess_exec(
             *rustc_cmd,
-            "@" + args_file.name,
+            f"@{args_file.name}",
             env=env,
             stdin=subprocess.DEVNULL,
-            stdout=None,  # Inherit
+            stdout=None,
             stderr=subprocess.PIPE,
             limit=1_000_000,
         )

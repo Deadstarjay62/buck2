@@ -41,9 +41,8 @@ class PartialBuildMap:
                 raise BuildMapLoadError(
                     f"Build map values are expected to be strings. Got `{value}`."
                 )
-            if pathlib.Path(key).suffix not in (".py", ".pyi"):
-                continue
-            result[key] = value
+            if pathlib.Path(key).suffix in {".py", ".pyi"}:
+                result[key] = value
         return PartialBuildMap(result)
 
     @staticmethod

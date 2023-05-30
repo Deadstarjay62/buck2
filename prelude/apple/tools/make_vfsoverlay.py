@@ -70,16 +70,14 @@ def main() -> None:
 def _get_roots(mappings: Dict[str, List[Tuple[str, str]]]) -> List[OverlayRoot]:
     roots = []
     for folder, file_maps in mappings.items():
-        contents = []
-        for src, dst in file_maps:
-            contents.append(
-                {
-                    "name": src,
-                    "type": "file",
-                    "external-contents": dst,
-                }
-            )
-
+        contents = [
+            {
+                "name": src,
+                "type": "file",
+                "external-contents": dst,
+            }
+            for src, dst in file_maps
+        ]
         roots.append(
             {
                 "name": folder,

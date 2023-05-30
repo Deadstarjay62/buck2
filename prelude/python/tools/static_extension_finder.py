@@ -18,8 +18,6 @@ except BaseException:
 
 class StaticExtensionFinder:
     @classmethod
-    # pyre-fixme[3]: Return type must be annotated.
-    # pyre-fixme[2]: Parameter must be annotated.
     def find_spec(cls, fullname, path, target=None):
         """
         Use fullname to look up the PyInit function in the main binary. Returns None if not present.
@@ -29,10 +27,12 @@ class StaticExtensionFinder:
             return None
         if not _check_module(fullname):
             return None
-        spec = ModuleSpec(
-            fullname, StaticExtensionLoader, origin="static-extension", is_package=False
+        return ModuleSpec(
+            fullname,
+            StaticExtensionLoader,
+            origin="static-extension",
+            is_package=False,
         )
-        return spec
 
 
 # pyre-fixme[3]: Return type must be annotated.

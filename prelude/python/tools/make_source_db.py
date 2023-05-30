@@ -53,15 +53,12 @@ def main(argv):
     parser.add_argument("--dependency", action="append", default=[])
     args = parser.parse_args(argv[1:])
 
-    db = {}
-
     # Add sources.
     sources = {}
     if args.sources is not None:
         for name, path, _ in _load(args.sources):
             sources[name] = path
-    db["sources"] = sources
-
+    db = {"sources": sources}
     # Add dependencies.
     dependencies = {}
     for dep in args.dependency:

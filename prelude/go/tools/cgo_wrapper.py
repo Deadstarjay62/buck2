@@ -32,18 +32,14 @@ def main(argv):
 
     cmd = []
     cmd.extend(args.cgo)
-    # cmd.append("-importpath={}")
-    # cmd.append("-srcdir={}")
-    cmd.append(f"-objdir={output}")
-    # cmd.append(cgoCompilerFlags)
-    cmd.append("--")
+    cmd.extend((f"-objdir={output}", "--"))
     # cmd.append(cxxCompilerFlags)
 
     with tempfile.NamedTemporaryFile("w", delete=False) as argsfile:
         for arg in args.cpp[1:]:
             print(pipes.quote(arg), file=argsfile)
             argsfile.flush()
-    cmd.append("@" + argsfile.name)
+    cmd.append(f"@{argsfile.name}")
 
     cmd.extend(args.srcs)
     r = subprocess.call(cmd)

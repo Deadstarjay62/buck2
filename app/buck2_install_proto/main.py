@@ -56,13 +56,11 @@ class RsyncInstallerService(install_pb2_grpc.InstallerServicer):
             error_detail.message = stderr
             response["error_detail"] = error_detail
 
-        file_response = install_pb2.FileResponse(**response)
-        return file_response
+        return install_pb2.FileResponse(**response)
 
     def ShutdownServer(self, _request, _context):
         shutdown(self.stop_event)
-        response = install_pb2.ShutdownResponse()
-        return response
+        return install_pb2.ShutdownResponse()
 
     def rsync_install(self, src, dst):
         if not (dst_parent := Path(dst).parent).exists():
@@ -89,8 +87,7 @@ def try_command(
     shell: bool = False,
 ):
     try:
-        output = subprocess.check_output(cmd, cwd=cwd, env=env, shell=shell)
-        return output
+        return subprocess.check_output(cmd, cwd=cwd, env=env, shell=shell)
     except Exception as e:
         print(f"Failed step {err_msg} with {str(e)}")
         raise e
@@ -111,7 +108,7 @@ def serve(args):
         RsyncInstallerService(stop_event, args), server
     )
     ## https://grpc.github.io/grpc/python/grpc.html
-    listen_addr = server.add_insecure_port("[::]:" + args.tcp_port)
+    listen_addr = server.add_insecure_port(f"[::]:{args.tcp_port}")
     print(f"Started server on {listen_addr} w/ pid {os.getpid()}")
     server.start()
     signal.signal(signal.SIGINT, lambda x, y: shutdown(stop_event))

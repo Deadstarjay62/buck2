@@ -37,18 +37,15 @@ def _call_or_exit(cmd: List[str]):
 
 
 def _compile(compile_prefix: List[str], output: Path, srcs: List[Path]):
-    cmd = []
-    cmd.extend(compile_prefix)
-    cmd.append("-trimpath={}".format(os.getcwd()))
-    cmd.append("-o")
+    cmd = list(compile_prefix)
+    cmd.extend((f"-trimpath={os.getcwd()}", "-o"))
     cmd.append(output)
     cmd.extend(srcs)
     _call_or_exit(cmd)
 
 
 def _pack(pack_prefix: List[str], output: Path, items: List[Path]):
-    cmd = []
-    cmd.extend(pack_prefix)
+    cmd = list(pack_prefix)
     cmd.append("r")
     cmd.append(output)
     cmd.extend(items)

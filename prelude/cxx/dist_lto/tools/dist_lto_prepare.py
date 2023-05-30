@@ -34,14 +34,10 @@ def _gen_path(parent_path: str, filename: str) -> str:
 
 
 def _gen_filename(filename: str, num_of_instance: int) -> str:
-    # generate the filename based on the instance,
-    # for 1st instance, it's file.o
-    # for 2nd instance, it's file_1.o
-    if num_of_instance > 1:
-        basename, extension = os.path.splitext(filename)
-        return f"{basename}_{num_of_instance-1}{extension}"
-    else:
+    if num_of_instance <= 1:
         return filename
+    basename, extension = os.path.splitext(filename)
+    return f"{basename}_{num_of_instance-1}{extension}"
 
 
 def identify_file(path: str) -> Tuple[ArchiveKind, str]:

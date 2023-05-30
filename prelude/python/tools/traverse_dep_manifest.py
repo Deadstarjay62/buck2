@@ -45,13 +45,14 @@ def main() -> int:
     extra = included - required
 
     with open(args.outfile, "w") as out:
-        report = {}
-        report["all_modules_count"] = len(included)
-        report["required_modules_count"] = len(required)
-        report["extra_modules_count"] = len(extra)
-        report["all_modules"] = sorted(included)
-        report["required_modules"] = sorted(required)
-        report["extra_modules"] = sorted(extra)
+        report = {
+            "all_modules_count": len(included),
+            "required_modules_count": len(required),
+            "extra_modules_count": len(extra),
+            "all_modules": sorted(included),
+            "required_modules": sorted(required),
+            "extra_modules": sorted(extra),
+        }
         out.write(json.dumps(report, indent=2))
 
     return 0

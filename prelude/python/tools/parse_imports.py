@@ -50,10 +50,7 @@ class ImportVisitor(ast.NodeVisitor):
 
     def _add(self, module: str, lineno: int) -> None:
         path = module.split(".")
-        if path[0] in self.stdlib:
-            return
-        # Ignore __manifest__ file which are generated
-        elif any(chunk == "__manifest__" for chunk in path):
+        if path[0] in self.stdlib or "__manifest__" in path:
             return
         self.modules[module] = lineno
 
@@ -238,7 +235,7 @@ def update_symbols_with_star_imports(
             resolve_one(other)
             symbols[current].update(symbols[other])
 
-    for module in star_imports.keys():
+    for module in star_imports:
         resolve_one(module)
 
 

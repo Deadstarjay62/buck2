@@ -49,7 +49,7 @@ def main(argv):
                 continue
 
             for src_base, src_path in sources.items():
-                if base == src_base or src_base.endswith("/" + base):
+                if base == src_base or src_base.endswith(f"/{base}"):
                     classes.append(
                         {
                             "className": classname,

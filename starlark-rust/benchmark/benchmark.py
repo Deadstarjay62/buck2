@@ -20,8 +20,7 @@ REPEAT_100M = 100000000
 
 
 def benchmark_loop():
-    for _x in range(REPEAT_100M):
-        pass
+    pass
 
 
 def benchmark_multiply():
@@ -52,10 +51,9 @@ def op4(_x):
 
 
 def benchmark_call_def_1pos():
-    y = 0
     for x in range(REPEAT_100M):
         op4(x)
-    return y
+    return 0
 
 
 def op5(_a, _b, _c, _d, _e, _f, _g, _h):
@@ -63,10 +61,9 @@ def op5(_a, _b, _c, _d, _e, _f, _g, _h):
 
 
 def benchmark_call_def_8pos():
-    y = 0
     for x in range(REPEAT_100M):
         op5(x, x, x, x, x, x, x, x)
-    return y
+    return 0
 
 
 def op6(a):
@@ -74,10 +71,9 @@ def op6(a):
 
 
 def benchmark_call_def_1name():
-    y = 0
     for x in range(REPEAT_100M):
         op6(a=x)
-    return y
+    return 0
 
 
 def op7(a, b, c, d, e, f, g, h):
@@ -85,10 +81,9 @@ def op7(a, b, c, d, e, f, g, h):
 
 
 def benchmark_call_def_8name():
-    y = 0
     for x in range(REPEAT_100M):
         op7(a=x, b=x, c=x, d=x, e=x, f=x, g=x, h=x)
-    return y
+    return 0
 
 
 print(benchmark_call_def_1name())

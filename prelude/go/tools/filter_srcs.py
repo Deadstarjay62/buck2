@@ -35,21 +35,16 @@ def main(argv):
     parser.add_argument("srcdir", type=Path)
     args = parser.parse_args(argv[1:])
 
-    # Find all source sub-dirs, which we'll need to run `go list` from.
-    # go:embed does not parse symlinks, so following the links to the real paths
-    roots = set()
-    for root, _dirs, _files in os.walk(args.srcdir):
-        roots.add(root)
-
+    roots = {root for root, _dirs, _files in os.walk(args.srcdir)}
     # Run `go list` on all source dirs to filter input sources by build pragmas.
     for root in roots:
         out = subprocess.check_output(
             [
                 "env",
                 "-i",
-                "GOARCH={}".format(os.environ.get("GOARCH", "")),
-                "GOOS={}".format(os.environ.get("GOOS", "")),
-                "CGO_ENABLED={}".format(os.environ.get("CGO_ENABLED", "0")),
+                f'GOARCH={os.environ.get("GOARCH", "")}',
+                f'GOOS={os.environ.get("GOOS", "")}',
+                f'CGO_ENABLED={os.environ.get("CGO_ENABLED", "0")}',
                 "GO111MODULE=off",
                 "GOCACHE=/tmp",
                 args.go.resolve(),

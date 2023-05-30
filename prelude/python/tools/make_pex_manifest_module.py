@@ -44,9 +44,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def path_to_module(path: str) -> Optional[str]:
-    if not path.endswith(".py"):
-        return None
-    return path[:-3].replace("/", ".")
+    return None if not path.endswith(".py") else path[:-3].replace("/", ".")
 
 
 def main() -> None:
@@ -64,7 +62,7 @@ def main() -> None:
                 modules.add(pkg_path)
                 # Add artificial __init__.py files like in make_pex_modules.py
                 for parent in Path(pkg_path).parents:
-                    if parent == Path("") or parent == Path("."):
+                    if parent in [Path(""), Path(".")]:
                         continue
                     modules.add(str(parent / "__init__.py"))
     entries = {}

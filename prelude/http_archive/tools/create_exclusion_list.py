@@ -27,9 +27,8 @@ def main() -> None:
 
     with open(args.out, "w", encoding="utf-8") as out:
         for f in files:
-            if all(excl.match(f) is None for excl in exclusions):
-                continue
-            out.write("{}\n".format(f))
+            if any(excl.match(f) is not None for excl in exclusions):
+                out.write(f"{f}\n")
 
 
 if __name__ == "__main__":

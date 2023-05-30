@@ -146,7 +146,7 @@ def write_bootstrapper(args: argparse.Namespace) -> None:
     if args.preload_libraries:
         ld_preload = repr(":".join(p.name for p in args.preload_libraries))
 
-    new_data = data.replace("<PYTHON>", "/usr/bin/env " + str(args.python))
+    new_data = data.replace("<PYTHON>", f"/usr/bin/env {str(args.python)}")
     new_data = new_data.replace("<PYTHON_INTERPRETER_FLAGS>", "")
     # new_data = new_data.replace(
     #    "<PYTHON_INTERPRETER_FLAGS>", args.python_interpreter_flags

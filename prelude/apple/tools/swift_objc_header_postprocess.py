@@ -262,7 +262,7 @@ def main() -> None:
     # output, unlikely though they may be, with avoiding adding too much complexity and getting
     # too close to implementing a full parser for Objective-C un-preprocessed header files.
 
-    with open(args.header) as header, open(args.out, "w") as out:
+    with (open(args.header) as header, open(args.out, "w") as out):
         # When this is None, it means that we are still searching for the start of the conditional
         # @import block in the generated header.
         modules = None
@@ -278,33 +278,32 @@ def main() -> None:
             if modules is None:
                 # The line changed from __has_feature(modules) to __has_feature(objc_modules) between Swift5.7 and Swift5.8.
                 # For the time being, we need to check for either to support both Xcode14.2 and Xcode14.3 onwards.
-                if (
-                    line == "#if __has_feature(objc_modules)"
-                    or line == "#if __has_feature(modules)"
-                ):
+                if line in [
+                    "#if __has_feature(objc_modules)",
+                    "#if __has_feature(modules)",
+                ]:
                     modules = []
                     if_level = 1
-            else:
-                if line.startswith("@import"):
-                    # Splitting on:
-                    #   "@import ": to separate from the @import.
-                    #   Semicolon and period: to separate the main module name from submodules or EOL.
-                    # The module name will then be the first item.
-                    modules.append(re.split(r"@import |[;.]", line)[1])
-                elif line.startswith("#if"):
-                    # This allows us to handle the Clang diagnostic #if block that the compiler inserts
-                    # within the main #if block for modules.
-                    if_level += 1
-                elif line.startswith("#endif"):
-                    if_level -= 1
-                    if if_level == 0:
-                        write_imports_for_modules(
-                            out,
-                            postprocessing_module_name,
-                            modules,
-                            deps,
-                        )
-                        modules = None
+            elif line.startswith("@import"):
+                # Splitting on:
+                #   "@import ": to separate from the @import.
+                #   Semicolon and period: to separate the main module name from submodules or EOL.
+                # The module name will then be the first item.
+                modules.append(re.split(r"@import |[;.]", line)[1])
+            elif line.startswith("#if"):
+                # This allows us to handle the Clang diagnostic #if block that the compiler inserts
+                # within the main #if block for modules.
+                if_level += 1
+            elif line.startswith("#endif"):
+                if_level -= 1
+                if if_level == 0:
+                    write_imports_for_modules(
+                        out,
+                        postprocessing_module_name,
+                        modules,
+                        deps,
+                    )
+                    modules = None
             print(line, file=out)
 
 
